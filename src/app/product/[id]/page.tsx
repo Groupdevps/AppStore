@@ -1,6 +1,11 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { useCart } from "@/hooks/useCart";
+type ProductPageProps = {
+  params: {
+    id: string;
+  };
+};
 // Simulación de productos (en la vida real vendría de una base de datos o API)
 const products = [
   {
@@ -25,7 +30,7 @@ function getProductById(id: string) {
 }
 
 // ✅ Vista del producto individual
-export default function ProductPage({ params }: { params: { id: string } }) {
+export default function ProductPage({ params }: ProductPageProps) {
   const product = getProductById(params.id);
   const { addToCart } = useCart();
   const handleAdd = () => {
