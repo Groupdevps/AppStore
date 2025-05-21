@@ -25,13 +25,13 @@ const products = [
 ];
 
 // 👇 Función para obtener datos por ID
-function getProductById(id: string) {
+async function getProductById(id: string) {
   return products.find((p) => p.id === id);
 }
 
 // ✅ Vista del producto individual
-export default function ProductPage({ params }: ProductPageProps) {
-  const product = getProductById(params.id);
+export default async function ProductPage({ params }: ProductPageProps) {
+  const product = await getProductById(params.id);
   const { addToCart } = useCart();
   const handleAdd = () => {
     addToCart({
