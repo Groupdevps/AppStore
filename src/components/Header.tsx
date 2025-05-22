@@ -3,15 +3,18 @@
 import { ShoppingCart, User, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useCart } from '@/hooks/useCart';
+import { useUser } from '@/hooks/useUser';
+import UserMenu from "@/components/UserMenu";
 
 export default function Header(){
     const { getTotalQuantity } = useCart(); 
     const totalItems = getTotalQuantity();
+     const { user } = useUser();
     
     return (
         <header className="border-b border-gray-200">
             <div className="max-w-7x1 mx-auto px-4 py-3 flex justify-between items-center">
-                <Link href="/" className='text-2x1 pl-12 font-bold tracking-wide  '>Julie</Link>
+                <Link href="/" className='text-2x1 pl-12 font-bold tracking-wide  '> {user?.displayName || user?.name || 'Julie'} </Link>
                 <nav className='hidden md:flex gap-6 text-sm font-medium text-gray-700'>
                     <Link href="/"> Home</Link> 
                     <Link href="/shop"> Shop</Link> 
@@ -25,9 +28,7 @@ export default function Header(){
                     <button className='p-2 text-gray-500 hover:text-black'>
                         <Search size={20} />
                     </button>
-                    <button className='p-2 text-gray-500 hover:text-black'>
-                        <User size={20} />
-                    </button>
+                    <UserMenu />
                     <Link href="/cart" className="relative p-2 text-gray-500 hover:text-black">                    
                         <ShoppingCart size={20} />
                         {totalItems > 0 && (

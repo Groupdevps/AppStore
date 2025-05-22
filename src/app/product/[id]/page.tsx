@@ -1,57 +1,80 @@
-import { notFound } from "next/navigation";
+"use client"
+import { notFound, useParams } from "next/navigation";
 import Image from "next/image";
 import { useCart } from "@/hooks/useCart";
-type ProductPageProps = {
-  params: {
-    id: string;
-  };
-};
-// Simulación de productos (en la vida real vendría de una base de datos o API)
-const products = [
-  {
-    id: "1",
-    name: "Floral Dress",
-    description: "Elegant floral dress perfect for spring.",
-    price: 79.99,
-    imageUrl: "/images/floral-dress.jpg",
-  },
-  {
-    id: "2",
-    name: "Black Maxi Dress",
-    description: "Classic and timeless black maxi dress.",
-    price: 99.99,
-    imageUrl: "/images/black-maxi.jpg",
-  },
-];
+import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/firebase";
+import {Product} from "@/types/Product";
+import { saveViewedProduct } from "@/utils/localHistory";
+import { useUser } from "@/hooks/useUser";
+import { logProductView } from "@/utils/logProductView";
 
-// 👇 Función para obtener datos por ID
-async function getProductById(id: string) {
-  return products.find((p) => p.id === id);
-}
 
-// ✅ Vista del producto individual
-export default async function ProductPage({ params }: ProductPageProps) {
-  const product = await getProductById(params.id);
+
+// Vista del producto individual
+export default function ProductPage() {
+  const params = useParams();
   const { addToCart } = useCart();
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+   const {user} = useUser();
+
+  useEffect(() => {
+    async function fetchProduct() {
+      if (params?.id) {
+        try {
+          const docRef = doc(db, "products", params.id as string);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            setProduct({ id: docSnap.id, ...docSnap.data() } as Product);
+            
+            if (!user) {              
+              saveViewedProduct(docSnap.id); 
+            }else{
+              logProductView(user?.id, docSnap.id);
+            }
+          } else {
+            setProduct(null);
+          }
+        } catch (error) {
+          setProduct(null);
+          console.error("Error fetching product:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    }
+    fetchProduct();
+  }, [params?.id]);
+
+  if (loading) {
+    return <div className="p-8 text-center">Loading...</div>;
+  }
+
+  if (!product) {
+    notFound();
+  }
+  
   const handleAdd = () => {
     addToCart({
       id: product?.id,
       name: product?.name,
-      price: product?.price,
-      imageUrl: product?.imageUrl,
+      price: product?.price,      
+      image: product?.image,
       quantity: 1,
     });
   };
 
-  if (!product) {
-    notFound(); // Muestra la página 404 si no existe el producto
-  }
+  // if (!product) {
+  //   notFound(); // Muestra la página 404 si no existe el producto
+  // }
 
   return (
     <main className="max-w-4xl mx-auto px-6 py-12">
       <div className="grid md:grid-cols-2 gap-8 items-start">
         <Image
-          src={product.imageUrl}
+          src={product.image}
           alt={product.name}
           width={500}
           height={600}

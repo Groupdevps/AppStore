@@ -1,10 +1,10 @@
-
+import Link from "next/link";
 export default function HeroSection() {
   return (
     <section className="relative bg-white py-16 px-6 lg:px-20 flex flex-col-reverse lg:flex-row items-center justify-between">
       <div className="w-full lg:w-1/2 flex justify-center mb-8 lg:mb-0">
         <img
-          src="/hero-model.png"
+          src="/heroImage.png"
           alt="Hero Model"
           className="max-w-sm w-full object-cover"
         />
@@ -19,13 +19,12 @@ export default function HeroSection() {
           There are many variations of passages of Lorem Ipsum available,
           but the majority have suffered alteration in some form.
         </p>
-        <button className="bg-pink-500 text-white px-6 py-3 rounded-full shadow-md hover:bg-pink-600 transition">
-          Shop Now
-        </button>
+        <Link href="/product/zXiwGYfWpPeCko66qkMQ">
+          <button className="bg-pink-500 text-white px-6 py-3 rounded-full shadow-md hover:bg-pink-600 transition">
+            Shop Now
+          </button>
+        </Link>
       </div>
-
-      
-      
     </section>
   );
 }

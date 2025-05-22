@@ -1,23 +1,34 @@
-// FakePaypal
 "use client";
 
 import { useState } from "react";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "@/firebase";
 
 type Props = {
   amount: number;
+  userId: string;
+  orderId: string;
   onSuccess: (details: { payerName: string; paymentId: string }) => void;
 };
 
-export default function FakePaypal({ amount, onSuccess }: Props) {
+export default function FakePaypal({ amount, userId, orderId, onSuccess }: Props) {
   const [loading, setLoading] = useState(false);
 
-  const handleFakePayment = () => {
+  const handleFakePayment = async () => {
     setLoading(true);
-    setTimeout(() => {
+    setTimeout(async () => {
       const fakePaymentId = "FAKE-" + Math.random().toString(36).substring(2, 10).toUpperCase();
+      // Guardar en payments de Firestore
+      await addDoc(collection(db, "payments"), {
+        userId,
+        orderId,
+        amount,
+        paymentId: fakePaymentId,
+        createdAt: new Date(),
+      });
       onSuccess({ payerName: "Test User", paymentId: fakePaymentId });
       setLoading(false);
-    }, 2000); // simulate delay
+    }, 2000);
   };
 
   return (
