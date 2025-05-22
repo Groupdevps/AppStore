@@ -6,7 +6,7 @@
 # Error details
 
 ```
-TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.
+TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
 Call log:
   - waiting for locator('button:has-text("Pay with Simulated PayPal")') to be visible
 
@@ -94,13 +94,14 @@ Call log:
   35 |     await page.click('button:has-text("Proceder al Pago")')
   36 |   }
   37 |   // 7. Pagar
-> 38 |   await page.waitForSelector('button:has-text("Pay with Simulated PayPal")', { timeout: 5000 });
-     |              ^ TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.
+> 38 |   await page.waitForSelector('button:has-text("Pay with Simulated PayPal")', { timeout: 10000 });
+     |              ^ TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
   39 | //   await expect(page.getByRole('button', { name: 'Pay with Simulated PayPal' })).toBeVisible();
   40 |   await page.click('button:has-text("Pay with Simulated PayPal")');
   41 |
   42 |   // 8. Verificar mensaje de éxito
-  43 |    await page.waitForSelector('button:has-text("Pago realizado con éxito")', { timeout: 5000 });
-  44 |   await expect(page.locator('text=¡Pago realizado con éxito!')).toBeVisible();
-  45 | });
+  43 |
+  44 | //    await page.waitForSelector('button:has-text("Pago realizado con éxito")', { timeout: 5000 });
+  45 |   await expect(page.locator('text=¡Pago realizado con éxito!')).toBeVisible();
+  46 | });
 ```

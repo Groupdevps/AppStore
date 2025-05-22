@@ -5,10 +5,10 @@ import Link from "next/link";
 import { useCart } from "@/hooks/useCart";
 import { useUser } from "@/hooks/useUser";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ShippingForm from "@/components/ShippingForm";
 import Paypal from "@/components/Paypal";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, doc, getDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 
 export default function CartPage() {
@@ -16,23 +16,43 @@ export default function CartPage() {
   const { user } = useUser();
   const router = useRouter();
   const [showAddressForm, setShowAddressForm] = useState(false);
-  const [address, setAddress] = useState(user?.address || "");
-  const [postalCode, setPostalCode] = useState(user?.postalCode || "");
+  const [address, setAddress] = useState(user?.infoPayment?.address || "");
+  const [postalCode, setPostalCode] = useState(user?.infoPayment?.postalCode || "");
   const [orderId, setOrderId] = useState<string | null>(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
-  
+  const [loadingUserInfo, setLoadingUserInfo] = useState(true);
+
+  // Buscar infoPayment en Firestore al cargar el usuario
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      if (user?.uid) {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists() && userSnap.data().infoPayment) {
+          const info = userSnap.data().infoPayment;
+          setAddress(info.address || "");
+          setPostalCode(info.postalCode || "");
+        }
+      }
+      setLoadingUserInfo(false);
+    };
+    fetchUserInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.uid]);
+
   const handleProceed = async () => {
     if (!user) {
       router.push("/login");
       return;
     }
-    if (!address || !postalCode) {
+    // Validar si el usuario ya tiene dirección y código postal guardados
+    const userAddress = address;
+    const userPostal = postalCode;
+    if (!userAddress || !userPostal) {
       setShowAddressForm(true);
       return;
     }
     await handleCreateOrder();
-    setPaymentSuccess(true);
-    clearCart(); // Limpiar el carrito después de proceder al pago
   };
 
   const handleSaveAddress = (e: React.FormEvent) => {
@@ -60,12 +80,18 @@ export default function CartPage() {
     });
     setOrderId(orderRef.id);
   };
+  const handleProceedPay= async () =>{    
+    setPaymentSuccess(true)
+    clearCart(); // Limpiar el carrito después de proceder al pago
+  }
 
   return (
     <main className="max-w-4xl mx-auto px-6 py-12 text-gray-800">
       <h1 className="text-3xl font-bold mb-8">Tu Carrito</h1>
 
-      {paymentSuccess ? (
+      {loadingUserInfo ? (
+        <div className="text-center py-16">Cargando información...</div>
+      ) : paymentSuccess ? (
         <div className="text-green-600 text-center mt-6 font-bold">
           ¡Pago realizado con éxito!
         </div>
@@ -157,7 +183,7 @@ export default function CartPage() {
                 amount={total}
                 userId={user.uid}
                 orderId={orderId}
-                onSuccess={() => setPaymentSuccess(true)}
+                onSuccess={() => handleProceedPay()}
               />
             </div>
           )}
