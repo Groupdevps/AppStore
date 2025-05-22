@@ -73,7 +73,7 @@ export default function ProductPage() {
   return (
     <main className="max-w-4xl mx-auto px-6 py-12">
       <div className="grid md:grid-cols-2 gap-8 items-start">
-        <Image
+        <img
           src={product.image}
           alt={product.name}
           width={500}
