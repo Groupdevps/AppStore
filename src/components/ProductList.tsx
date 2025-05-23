@@ -25,10 +25,10 @@ export default function ProductList() {
     setBestSellers(bestSellerArr);
 
     const localHistory = getViewedProducts().slice(-6).reverse();
-    console.log("Local History:", localHistory);
+    // console.log("Local History:", localHistory);
     // Últimos vistos (máximo 6, solo si usuario logueado)
-    if (user?.id) {
-      const userRef = doc(db, "users", user.id);
+    if (user?.uid) {
+      const userRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userRef);
       const recentlyViewed: string[] = userSnap.exists() && userSnap.data().recentlyViewed
         ? userSnap.data().recentlyViewed.slice(-6).reverse()

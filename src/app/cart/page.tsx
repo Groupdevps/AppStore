@@ -66,8 +66,9 @@ export default function CartPage() {
   const handleCreateOrder = async () => {
     if (!user) return;
     // Crear la orden en Firestore
+    // console.log("cartItems", cartItems) 
     const orderRef = await addDoc(collection(db, "orders"), {
-      userId: user.uid,
+      userId: user.uid ?? "",
       total,
       items: cartItems.map(item => ({
         id: item.id,

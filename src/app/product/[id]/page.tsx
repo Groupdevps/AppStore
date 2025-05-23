@@ -32,7 +32,7 @@ export default function ProductPage() {
             if (!user) {              
               saveViewedProduct(docSnap.id); 
             }else{
-              logProductView(user?.id, docSnap.id);
+              logProductView(user?.uid, docSnap.id);
             }
           } else {
             setProduct(null);
@@ -57,7 +57,9 @@ export default function ProductPage() {
   }
   
   const handleAdd = () => {
+    // console.log("product" , product)
     addToCart({
+      uid: product?.uid,
       id: product?.id,
       name: product?.name,
       price: product?.price,      

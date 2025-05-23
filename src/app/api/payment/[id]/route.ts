@@ -3,8 +3,9 @@ import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyJWT } from '@/lib/auth';
 
-export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
-  const docRef = doc(db, 'payments', params.id);
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+  const docRef = doc(db, 'payments', id);
   const snapshot = await getDoc(docRef);
 
   if (!snapshot.exists()) {
@@ -14,11 +15,12 @@ export async function GET(_: NextRequest, { params }: { params: { id: string } }
   return NextResponse.json({ id: snapshot.id, ...snapshot.data() });
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = verifyJWT();
+    const { id } = await params;
     const data = await req.json();
-    const docRef = doc(db, 'payments', params.id);
+    const docRef = doc(db, 'payments', id);
     await updateDoc(docRef, data);
     return NextResponse.json({ message: 'Updated' });
   } catch {
@@ -26,10 +28,11 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(_: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     verifyJWT();
-    const docRef = doc(db, 'payments', params.id);
+    const { id } = await params;
+    const docRef = doc(db, 'payments', id);
     await deleteDoc(docRef);
     return NextResponse.json({ message: 'Deleted' });
   } catch {

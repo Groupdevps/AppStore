@@ -3,4 +3,5 @@ export interface Category {
   name: string;
   description: string;
   createdAt?: string;
+  slug: string;
 }

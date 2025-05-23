@@ -18,6 +18,7 @@ export default function ProductsPage() {
       const catSnap = await getDocs(collection(db, "categories"));
       const catArr = catSnap.docs.map(doc => ({
         name: doc.data().name,
+        description: doc.data().description,
         slug: doc.id,
       }));
       setCategories(catArr);
